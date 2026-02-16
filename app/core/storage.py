@@ -608,8 +608,9 @@ class SQLStorage(BaseStorage):
                     except Exception:
                         pass
         elif self.dialect in ("postgres", "postgresql", "pgsql"):
+            # 修复 advisory lock key 超出 int64 范围的问题
             lock_key = int.from_bytes(
-                hashlib.sha256(name.encode("utf-8")).digest()[:8], "big", signed=False
+                hashlib.sha256(name.encode("utf-8")).digest()[:8], "big", signed=True
             )
             async with self.async_session() as session:
                 start = time.monotonic()
